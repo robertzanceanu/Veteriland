@@ -1,0 +1,81 @@
+header{
+    background-color:	#800000;
+    top:0;
+    position:fixed;
+    width:100%;
+    left:0;
+    display:flex;
+    height:50px;
+}
+.title{
+    margin-top:-1%;
+    margin-left:5%;
+    color:white;
+}
+.barMeniu{
+    margin-left:55%;
+    margin-top:1%;  
+    
+}
+.barMeniu a{
+    /* margin-left:1%; */
+    color:white;
+    text-decoration:none;
+}
+.table-row {
+    display: flex;           
+    display: -webkit-flex;
+    flex-direction: row;     
+    /* -webkit-flex-direction: row; */
+    flex-grow: 0;            
+    /* -webkit-flex-grow: 0; */
+    /* flex-wrap: wrap;          */
+    /* -webkit-flex-wrap: wrap; */
+    width: 100%;
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+  
+  .text {
+    flex-grow: 1;
+    /* -webkit-flex-grow: 1; */
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    padding-right: 20px;
+  }
+  
+  .text {
+    width: 180px;
+    color:white;
+  }
+  
+  .num {
+    width:  80px;
+    color:white;
+}
+  
+  /*
+   * General good-look styles, not mandatory.
+   */
+   .container-fluid {
+    margin-top: 7%;
+    font-size: 20px;
+    /* width:90%; */
+    margin-left:3%;
+    margin-right:5%;
+  }
+  
+  .table-row {
+    border-bottom: 2px solid #9F2727;
+    background-color: #9F2727;
+    border-collapse: collapse;
+    padding-top: 5px;
+  }
+  
+  .table-row.header {
+    background-color: #BF5F5F;
+    font-weight: bold;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
