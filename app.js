@@ -51,7 +51,7 @@ app.use('/signUpUser',signUpUserRoute);
 app.use('/doctor',doctorRoute);
 app.use('/contactUs', contactUsRoute);
 app.use('/services', servicesRoute);
-
+app.use('/seeAnimals')
 app.listen(port,function(){
     console.log("Server is running on port "+port);
 })
