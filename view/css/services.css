@@ -1,0 +1,99 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.headerPage{
+    font-size: 20px;
+    display: flex;
+    flex-direction: row;
+    margin-top: -1%;
+    font-family: Courier;
+    overflow: hidden;
+    background-color: #FE8409;
+}
+
+.title{
+    flex: auto;
+    text-shadow: -1px -1px 1px #aaa,
+               0px 2px 1px rgba(0,0,0,0.5),
+               2px 2px 2px rgba(0,0,0,0.7),
+               0px 0px 3px rgba(0,0,0,0.4);
+    margin-left: 17px;
+    color: brown;
+}
+
+.loginAndSignUp{
+    margin-top: 3%;
+    margin-right: 10px;
+}
+
+.loginAndSignUp a {
+    border: 2px solid red;
+    padding: 7px;
+    text-decoration: none;
+    color: black;
+}
+
+.loginAndSignUp a:hover {
+    border: 2px solid brown;
+}
+
+.positionImage {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin-top: 2%;
+}
+
+.positionImage h2 {
+    margin-top: 3%;
+    font-size: 30px;
+    color: brown;
+    text-shadow: 2px 2px black;
+}
+
+.positionImage h3 {
+    margin-top: 7%;
+    font-size: 20px;
+    margin-right: 5%;
+}
+
+.contentServices h2, li {
+    margin-left: 40%;
+    font-size: 20px;
+}
+
+.contentServices h2 {
+    color: brown;
+    font-size: 25px;
+    margin-left: 43%;
+}
+
+.sendOnAPage {
+    display: flex;
+    flex-direction: row;
+    margin-left: 16%;
+    margin-top: 3%;
+}
+
+.services, .contactUs, .homePage {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    line-height: 100px;
+    text-align: center;
+    background: #FE8409;
+    margin-right: 20%;
+}
+
+.sendOnAPage a {
+    text-decoration: none;
+    font-size: 23px;
+    color: #fff;
+}
+
+.services:hover, .contactUs:hover, .homePage:hover {
+    background: #FE5E01;
+}

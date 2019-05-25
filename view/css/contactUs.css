@@ -1,0 +1,84 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.headerPage{
+    font-size: 20px;
+    display: flex;
+    flex-direction: row;
+    margin-top: -1%;
+    font-family: Courier;
+    overflow: hidden;
+    background-color: #FE8409;
+}
+
+.title{
+    flex: auto;
+    text-shadow: -1px -1px 1px #aaa,
+               0px 2px 1px rgba(0,0,0,0.5),
+               2px 2px 2px rgba(0,0,0,0.7),
+               0px 0px 3px rgba(0,0,0,0.4);
+    margin-left: 17px;
+    color: brown;
+}
+
+.loginAndSignUp{
+    margin-top: 3%;
+    margin-right: 10px;
+}
+
+.loginAndSignUp a {
+    border: 2px solid red;
+    padding: 7px;
+    text-decoration: none;
+    color: black;
+}
+
+.loginAndSignUp a:hover {
+    border: 2px solid brown;
+}
+
+.informationPage {
+    margin-left: 23%;
+    margin-top: 5%;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.location, .clock {
+    margin-bottom: 5%;
+}
+
+.sendOnAPage {
+    display: flex;
+    flex-direction: row;
+    margin-left: 16%;
+    margin-top: 6%;
+}
+
+.services, .contactUs, .homePage {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    line-height: 100px;
+    text-align: center;
+    background: #FE8409;
+    margin-right: 20%;
+}
+
+.sendOnAPage a {
+    text-decoration: none;
+    font-size: 23px;
+    color: #fff;
+}
+
+.services:hover, .contactUs:hover, .homePage:hover {
+    background: #FE5E01;
+}
