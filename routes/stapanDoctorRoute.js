@@ -34,9 +34,11 @@ router.get('/:id',function(req,res){
                     for(let i=0;i<result.rows.length;i++){
                     rowData[i] ={
                         id: result.rows[i][0],
-                        name: result.rows[i][1],
-                        age: result.rows[i][2],
-                        type: result.rows[i][3]
+                        lastName: result.rows[i][1],
+                        firstName: result.rows[i][2],
+                        age: result.rows[i][3],
+                        email: result.rows[i][4],
+                        phoneNumber:result.rows[i][5]
                     }
                 };
                     console.log(rowData);
