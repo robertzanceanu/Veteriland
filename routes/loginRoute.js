@@ -44,6 +44,11 @@ router.post('/', function (req, res) {
                                    failureRedirect: '/login' });
                         res.redirect('/doctor/'+rowData.id);
                     }
+                    else if(rowData.doctor==0){
+                        passport.authenticate('local', { successRedirect: '/stapan',
+                        failureRedirect: '/stapan' });
+             res.redirect('/stapan/'+rowData.id);
+                    }
                     doRelease(connection);
                 }
             );
