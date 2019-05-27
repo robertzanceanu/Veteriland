@@ -4,6 +4,7 @@ const app = express();
 const path = require('path');
 const oracledb = require('oracledb');
 const passport = require('passport');
+
 router.get('/', function (req, res) {
     res.sendFile(path.join(__dirname + '/../view/html/login.html'));
 });
@@ -41,13 +42,13 @@ router.post('/', function (req, res) {
                     console.log(rowData);
                     if(rowData.doctor==1){
                         passport.authenticate('local', { successRedirect: '/doctor',
-                                   failureRedirect: '/login' });
+                            failureRedirect: '/login' });
                         res.redirect('/doctor/'+rowData.id);
                     }
                     else if(rowData.doctor==0){
                         passport.authenticate('local', { successRedirect: '/stapan',
-                        failureRedirect: '/stapan' });
-             res.redirect('/stapan/'+rowData.id);
+                            failureRedirect: '/stapan' });
+                        res.redirect('/stapan/'+rowData.id);
                     }
                     doRelease(connection);
                 }

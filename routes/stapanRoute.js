@@ -5,21 +5,22 @@ const path = require('path');
 const oracledb = require('oracledb');
 
 global.Idd="";
+
 router.get('/:id', function (req, res) {
-    console.log(req.params.id);
+    //console.log(req.params.id);
     if(req._parsedOriginalUrl.pathname === '/stapan/doctori'){
-                console.log("IDDD");
-                console.log(Idd);
+                //console.log("IDDD");
+                //console.log(Idd);
                 res.redirect('/doctori/'+Idd);
                 // req._parsedOriginalUrl.pathname = '/stapan/doctori'+req.params.id;
             }
     else{
     res.sendFile(path.join(__dirname + '/../view/html/stapan.html'));
-    console.log("id sus");
-    console.log(req.params.id);
+    //console.log("id sus");
+    //console.log(req.params.id);
     Idd=req.params.id;
-    console.log("sesiune");
-    console.log(req._parsedOriginalUrl.pathname);
+    //console.log("sesiune");
+    //console.log(req._parsedOriginalUrl.pathname);
     }
 });
 // router.route('/:id').get(function(req,res){
@@ -34,8 +35,8 @@ router.get('/:id', function (req, res) {
 // })
 router.route('/json/:id').get(function(req,res){
     var userId = req.params.id;
-    console.log("id-ul");
-    console.log(req.params.id);
+    //console.log("id-ul");
+    //console.log(req.params.id);
     connection = oracledb.getConnection({
         user: "student",
         password: "STUDENT",
@@ -51,8 +52,8 @@ router.route('/json/:id').get(function(req,res){
                         console.error(err.message);
                         doRelease(connection);
                     }
-                    console.log("am AJINS AICI");
-                    console.log(result.rows);
+                    //console.log("am AJINS AICI");
+                    //console.log(result.rows);
                     var rowData = {
                         id: result.rows[0][0],
                         lastName: result.rows[0][1],
@@ -61,8 +62,8 @@ router.route('/json/:id').get(function(req,res){
                         email: result.rows[0][4],
                         phoneNumber: result.rows[0][5]
                     };
-                    console.log(rowData);
-                    console.log(result.rows[0][0]);
+                    //console.log(rowData);
+                    //console.log(result.rows[0][0]);
                     res.json(rowData);
                     doRelease(connection);
                 }
@@ -81,8 +82,8 @@ router.route('/json/:id').get(function(req,res){
 router.route('/pac/:id').get(function(req,res){
     var userId = req.params.id;
     //  var userId = req.params.id.split("progr");
-     console.log("mere");
-     console.log(userId);
+     //console.log("mere");
+     //console.log(userId);
     connection = oracledb.getConnection({
         user: "student",
         password: "STUDENT",
@@ -91,26 +92,26 @@ router.route('/pac/:id').get(function(req,res){
         // console.log("Connected")
         function (err, connection) {
             connection.execute(
-                `select p.* from pacienti p join pacient_stapan ps on p.id=ps.id_pacient join stapani s on s.id=ps.id_stapan join stapaniuseri su on su.id_stapan=s.id join useri u on u.id=su.id_user where u.id=:id`,
+                `select * from table(allAnimals(:id))`,
                 [id = userId],
                 function (err, result) {
                     if (err) {
                         console.error(err.message);
                         doRelease(connection);
                     }
-                    console.log("am AJINS AICI");
-                    console.log(result.rows.length); 
+                    //console.log("am AJINS AICI");
+                    //console.log(result.rows.length); 
                     var rowData = {};
                     for(let i=0;i<result.rows.length;i++){
                     rowData[i] ={
-                        id: result.rows[i][0],
-                        name: result.rows[i][1],
-                        age: result.rows[i][2],
-                        type: result.rows[i][3]
+                        //id: result.rows[i][0],
+                        name: result.rows[i][0],
+                        age: result.rows[i][1],
+                        type: result.rows[i][2]
                     }
                 };
-                    console.log(rowData);
-                    console.log(result.rows[0][0]);
+                    //console.log(rowData);
+                    //console.log(result.rows[0][0]);
                     res.json(rowData);
                     doRelease(connection);
                 }

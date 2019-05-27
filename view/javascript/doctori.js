@@ -15,9 +15,9 @@ fetch(url1)
         for (var i = 0; i < Object.keys(data).length; i++) {
             console.log(data[i].ownerEmail);
             // var node = document.createElement("");
-            output +="<div class = 'table-row'><div class='text'>"+data[i].lastName+"</div><div class='text'>"+data[i].firstName+"</div><div class='num'>"+data[i].age+"</div><div class='text'>"+data[i].email+"</div><div class='text'>"+data[i].phoneNumber+"</div></div>";
+            output +="<div class = 'table-row'><div class='text'>"+data[i].lastName+"</div><div class='text'>"+data[i].firstName+"</div><div class='text'>"+data[i].typeAnimal+"</div><div class='text'>"+data[i].phoneNumber+"</div></div>";
             // div.appendChild(content);
             // div.appendChild(node);
         }
-        document.getElementById('container-fluid').innerHTML= "<div class='table-row header'><div class='text'>Nume doctor</div><div class='text'>Prenume doctor</div><div class='num'>Varsta doctor</div><div class='text'>Email doctor</div><div class='text'>Numar de telefon</div></div>"+output;
+        document.getElementById('container-fluid').innerHTML= "<div class='table-row header'><div class='text'>Nume doctor</div><div class='text'>Prenume doctor</div><div class='text'>Specializare</div><div class='text'>Numar de telefon</div></div>"+output;
  })

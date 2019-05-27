@@ -16,6 +16,9 @@ const servicesRoute = require('./routes/servicesRoute');
 const contactUsRoute = require('./routes/contactUsRoute');
 const stapanRoute = require('./routes/stapanRoute');
 const stapanDoctorRoute = require('./routes/stapanDoctorRoute');
+const addProgramareRoute = require('./routes/addProgramareRoute');
+const addPacientRoute = require('./routes/addPacientRoute');
+
 var bodyParser = require('body-parser');
 app.use( bodyParser.json() );       
 app.use(bodyParser.urlencoded({     
@@ -56,6 +59,9 @@ app.use('/doctor',doctorRoute);
 app.use('/contactUs', contactUsRoute);
 app.use('/services', servicesRoute);
 app.use('/doctori',stapanDoctorRoute);
+app.use('/addProgramare', addProgramareRoute);
+app.use('/addPacient', addPacientRoute);
+
 // app.use('/seeAnimals')
 app.use('/stapan',stapanRoute);
 app.listen(port,function(){

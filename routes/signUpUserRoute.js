@@ -3,8 +3,9 @@ const express = require('express');
 const app = express();
 const path = require('path');
 const oracledb = require('oracledb');
+const passport = require('passport');
 
-module.exports = router.get('/',function(req,res) {
+router.get('/',function(req,res) {
     res.sendFile(path.join(__dirname+'/../view/html/signUpUser.html'));
   });
 
@@ -54,7 +55,10 @@ module.exports = router.get('/',function(req,res) {
                        console.error(err.message);
                        return;
                      }
-                     console.log("Succes");
+                     else {passport.authenticate('local', { successRedirect: '/login',
+                            failureRedirect: '/login' });
+                        res.redirect('/login');
+                    }
                    });
    
                }
@@ -64,5 +68,7 @@ module.exports = router.get('/',function(req,res) {
          }
          run();  
          }
-     res.end()
+     //res.end()
    });
+
+   module.exports = router;

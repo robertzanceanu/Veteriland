@@ -32,10 +32,10 @@ fetch(url1)
         for(var i=0;i<Object.keys(data).length;i++){
             console.log(data[i].ownerEmail);
             // var node = document.createElement("");
-            output +="<div class = 'table-row'><div class='text'>"+data[i].pacientName+"</div><div class='text'>"+data[i].ownerName+"</div><div class='text'>"+data[i].ownerEmail+"</div><div class='num'>"+data[i].pacientAge+"</div><div class='text'>"+data[i].pacientType+"</div><div class='text'>"+data[i].reason+"</div><div class='text'>"+data[i].date+"</div><div class='text'>"+data[i].hour+"</div></div>";
+            output +="<div class = 'table-row'><div class='text'>"+data[i].pacientName+"</div><div class='num'>"+data[i].pacientAge+"</div><div class='text'>"+data[i].pacientType+"</div><div class='text'>"+data[i].date+"</div><div class='text'>"+data[i].hour+"</div><div class='text'>"+data[i].reason+"</div></div>";
             // div.appendChild(content);
             // div.appendChild(node);
         }
-        document.getElementById('container-fluid').innerHTML= "<div class='table-row header'><div class='text'>Nume pacient</div><div class='text'>Nume stapan</div><div class='text'>Email stapan</div><div class='num'>Varsta</div><div class='text'>Tip animal</div><div class='text'>Motiv programare</div><div class='text'>Data programarii</div><div class='text'>Ora programarii</div></div><div class='table-row'><div class='text'>"+output;
+        document.getElementById('container-fluid').innerHTML= "<div class='table-row header'><div class='text'>Nume pacient</div><div class='num'>Varsta</div><div class='text'>Tip animal</div><div class='text'>Data programarii</div><div class='text'>Ora programarii</div><div class='text'>Motiv programare</div></div><div class='table-row'><div class='text'>"+output;
 
     })

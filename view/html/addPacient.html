@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+        <title> Programeaza-te </title>
+        <link rel="stylesheet" href="../css/addPacient.css">
+
+    </head>
+
+    <body>
+            <header>
+                    <div class="title">
+                        <h1>VeteriLand</h1>
+                    </div>
+            
+                    <div class="barMeniu">
+                        <a href="/stapan/doctori"><strong>Doctori</strong></a>
+                        <a href="/stapan"><strong>Animale</strong></a>
+                        <a href='/addProgramare'><strong>Adauga Programare</strong></a>
+                        <a href='/addPacient'><strong>Adauga Animal</strong></a>
+                        <a href="/"><strong>Logout</strong></a>
+                    </div>
+            
+                </header>
+
+        <div class="addPacientArea">  
+            <h2> Adauga un nou Animal </h2>
+            <form action="" method="POST" class="addPacientForm">
+                <p> Nume Pacient </p>
+                    <input type="text" placeholder="numele animalului" name="animalNume" required>
+                <p> Tip Animal </p>
+                    <input type="text" placeholder="tipul animalului" name="tipAnimal" required>
+                <p> Varsta </p>
+                    <input type="text" placeholder="varsta animalului" name="varstaAnimal" require>
+                <button type="submit"><strong> Submit </strong></button>    
+            </form>
+        </div>
+    </body>
+
+</html>

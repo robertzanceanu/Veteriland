@@ -13,11 +13,12 @@ header{
     color:white;
 }
 .barMeniu{
-    margin-left:55%;
+    margin-left:50%;
     margin-top:1%;  
     
 }
 .barMeniu a{
+    padding-left: 14px;
     color:white;
     text-decoration:none;
 }
@@ -78,3 +79,7 @@ header{
     color: #BF5F5F;
     margin-left:5%;
   }
+
+form {
+  margin-top: 7%;
+}
