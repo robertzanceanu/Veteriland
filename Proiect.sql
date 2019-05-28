@@ -160,7 +160,7 @@ DECLARE
 begin
     DBMS_OUTPUT.PUT_LINE('Inserare stapani');
     select count(*) into v_user_nr from useri;
-    FOR v_i in 1..100 LOOP
+    FOR v_i in 1..1000 LOOP
         v_nume := lista_nume_stapani(TRUNC(DBMS_RANDOM.VALUE(0,lista_nume_stapani.count))+1);
         IF(DBMS_RANDOM.VALUE(0,100)<50) THEN
             v_prenume := lista_prenume_fete(TRUNC(DBMS_RANDOM.VALUE(0,lista_prenume_fete.count))+1);
@@ -755,7 +755,7 @@ create or replace package body adaugaAnimal is
               select id into id_pacient_stapan from (select * from pacient_stapan order by id desc) where rownum = 1;
               id_pacient_stapan := id_pacient_stapan + 1;
               
-              select id_stapan into id_stapaan from stapaniuseri where id_stapan =idStapan;
+              select id_stapan into id_stapaan from stapaniuseri where id_user =idStapan;
               
               insert into pacienti values (id_pacient, numeAnimal, varstaAnimal, tipAnimal);
               insert into pacient_stapan values (id_pacient_stapan, id_pacient, id_stapaan);
