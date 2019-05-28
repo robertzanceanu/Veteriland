@@ -27,7 +27,7 @@ router.post('/:id', function(req, res){
   
                 connection.execute(
                   `BEGIN
-                    adaugaAnimal.adaugaUnNouAnimal(:userId, :animalNume, :varstaAnimal, :tipAnimal);
+                      adaugaAnimal.adaugaUnNouAnimal(:userId, :animalNume, :varstaAnimal, :tipAnimal);
                    END;`, {
                               userId: userId,
                               animalNume: animalNume,
@@ -40,9 +40,9 @@ router.post('/:id', function(req, res){
                       console.error(err.message);
                       return;
                     }
-                    else {passport.authenticate('local', { successRedirect: '/addPacient/:userId',
-                            failureRedirect: '/addPacient/:userId' });
-                        res.redirect('/addPacient/:userId');
+                    else {passport.authenticate('local', { successRedirect: '/addPacient/' + userId,
+                            failureRedirect: '/addPacient/' + userId });
+                        res.redirect('/addPacient/' + userId);
                     }
                   });
   

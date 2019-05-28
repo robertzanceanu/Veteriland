@@ -742,7 +742,11 @@ create or replace package body adaugaAnimal is
           existaSpecializare NUMBER;
           id_pacient NUMBER;
           id_pacient_stapan NUMBER;
+          id_stapaan NUMBER;
         begin
+          DBMS_OUTPUT.PUT_LINE(idStapan ||' '||numeAnimal||' '||varstaAnimal||' '||tipAnimal);
+
+        
           select count(*) into existaSpecializare from tip_animal where tip_animal = tipAnimal;
           if(existaSpecializare != 0) then
               select id into id_pacient from (select * from pacienti order by id desc) where rownum = 1;
@@ -750,9 +754,11 @@ create or replace package body adaugaAnimal is
           
               select id into id_pacient_stapan from (select * from pacient_stapan order by id desc) where rownum = 1;
               id_pacient_stapan := id_pacient_stapan + 1;
-          
+              
+              select id_stapan into id_stapaan from stapaniuseri where id_stapan =idStapan;
+              
               insert into pacienti values (id_pacient, numeAnimal, varstaAnimal, tipAnimal);
-              insert into pacient_stapan values (id_pacient_stapan, id_pacient, idStapan);
+              insert into pacient_stapan values (id_pacient_stapan, id_pacient, id_stapaan);
           else
               DBMS_OUTPUT.PUT_LINE('Nu ne ocupam de acest tip de animal.');
           end if;
@@ -762,8 +768,13 @@ end adaugaAnimal;
 /*
 set serveroutput on;
 BEGIN
-  adaugaAnimal.adaugaUnNouAnimal('1', 'Mironica', '5', 'Dinozaur');
+  adaugaAnimal.adaugaUnNouAnimal('1', 'Mironica', '5', 'Hamster');
 END;
 */
-
-select * from useri where doctor=0;
+select * from useri where email='kovaci.adelin3@gmail.com';
+select * from doctori where nume='Kovaci';
+select * from tip_animal;
+select * from pacienti where nume='Hapciu';
+select * from stapaniuseri; where doctor=0;
+select * from useri where stapan=1;
+select * from programari where data='12-NOV-19';
