@@ -638,22 +638,56 @@ create type t_tratamenteTrecute_type as table of tratamenteTrecute_type;
 create or replace function afiseazaTratamentePacient(numeStapan VARCHAR2, prenumeStapan VARCHAR2, numePacient VARCHAR2) return t_tratamenteTrecute_type pipelined
   as
     queue_obj t_tratamenteTrecute_type;
+    stapan_inexistent EXCEPTION;
+    PRAGMA EXCEPTION_INIT(stapan_inexistent, -20001);
+    pacient_inexistent EXCEPTION;
+    PRAGMA EXCEPTION_INIT(pacient_inexistent, -20002);
+    tratament_inexistent EXCEPTION;
+    PRAGMA EXCEPTION_INIT(tratament_inexistent, -20003);
+    existaStapan NUMBER;
+    existaPacient NUMBER;
+    existaTratament NUMBER;
   begin
-    for r_row in (select r.data, r.ora, d.nume, d.prenume, r.motiv, m.medicatie
-                  from stapani s join pacient_stapan p on s.id = p.id_stapan 
-                  join pacienti a on p.id_pacient = a.id
-                  join programari r on r.id_pacient = a.id
-                  join doctori d on d.id = r.id_doctor
-                  join pacient_tratament t on t.id_pacient = a.id
-                  join tratamente m on m.id = t.id_tratament
-                  where s.nume = numeStapan and s.prenume = prenumeStapan and a.nume = numePacient and r.data < sysdate)
-    loop
-        pipe row(tratamenteTrecute_type(r_row.data, r_row.ora, r_row.nume, r_row.prenume, r_row.motiv, r_row.medicatie));
-      end loop;
+    select count(*) into existaStapan from stapani where nume = numeStapan and prenume = prenumeStapan;
+    select count(*) into existaPacient from pacienti p join pacient_stapan a on a.id_pacient = p.id join stapani s on s.id = a.id_stapan
+              where p.nume = numePacient and s.nume = numeStapan and s.prenume = prenumeStapan;
+    select count(*) into existaTratament from tratamente t join pacient_tratament a on t.id = a.id_tratament join pacienti p on p.id = a.id_pacient
+            where p.nume = numePacient;
+            
+    if(existaStapan = 0) then
+      raise stapan_inexistent;
+    elsif(existaPacient = 0) then
+      raise pacient_inexistent;
+    elsif(existaTratament = 0) then
+      raise tratament_inexistent;
+    else
+        for r_row in (select r.data, r.ora, d.nume, d.prenume, r.motiv, m.medicatie
+                      from stapani s join pacient_stapan p on s.id = p.id_stapan 
+                      join pacienti a on p.id_pacient = a.id
+                      join programari r on r.id_pacient = a.id
+                      join doctori d on d.id = r.id_doctor
+                      join pacient_tratament t on t.id_pacient = a.id
+                      join tratamente m on m.id = t.id_tratament
+                      where s.nume = numeStapan and s.prenume = prenumeStapan and a.nume = numePacient and r.data < sysdate)
+        loop
+            pipe row(tratamenteTrecute_type(r_row.data, r_row.ora, r_row.nume, r_row.prenume, r_row.motiv, r_row.medicatie));
+          end loop;
+    end if;
+    
+    EXCEPTION
+      WHEN stapan_inexistent THEN
+        raise_application_error (-20001,'Stapanul ' || numeStapan || ' ' || prenumeStapan || ' nu exista in baza de date.');
+      WHEN pacient_inexistent THEN
+        raise_application_error (-20002,'Pacientul ' || numePacient || ' nu exista in baza de date.');
+      WHEN tratament_inexistent THEN
+        raise_application_error (-20003,'Pacientul ' || numePacient || ' nu a primit inca niciun tratament.');
 end afiseazaTratamentePacient;
 
 /*
 select * from table(afiseazaTratamentePacient('Fuca', 'Andrei', 'Cocorico'));
+select * from table(afiseazaTratamentePacient('Udangiu', 'Eusebiu', 'Pisicila')); 
+select * from stapani where nume = 'Fuca';
+select * from pacienti where nume = 'Pisicila';
 */
 
 create or replace function oreDisponibileProg(numeDoctor VARCHAR2, prenumeDoctor VARCHAR2, dataProgramare DATE) return VARCHAR2 as
@@ -771,10 +805,3 @@ BEGIN
   adaugaAnimal.adaugaUnNouAnimal('1', 'Mironica', '5', 'Hamster');
 END;
 */
-select * from useri where email='kovaci.adelin3@gmail.com';
-select * from doctori where nume='Kovaci';
-select * from tip_animal;
-select * from pacienti where nume='Hapciu';
-select * from stapaniuseri; where doctor=0;
-select * from useri where stapan=1;
-select * from programari where data='12-NOV-19';
