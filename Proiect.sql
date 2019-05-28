@@ -551,11 +551,13 @@ begin
   adaugaONouaProgramare.asignarePacientDoctor('Budincuta', 'Pisica', '12', 'Jneapan', 'Madalin', '12-AUG-19', '11:00', 'Stomatologie');
 end;
 */
-
+/*
 select * from doctori where id=5;
 select * from useri where doctor =1;
 select d.id, t.tip_animal, c.id_user, d.nume, d.prenume from tip_animal t join specializare a on a.id_animal = t.id join doctori d on d.id = a.id_doctor
     join doctoriuseri c on c.id_doctor = d.id join useri p on p.id = c.id_user where t.tip_animal='Pisica';
+*/
+
 -- pipelined table function --
 create type findProgramareDoctori_tye is object 
   (nume_pacient VARCHAR2(30), varsta_pacient VARCHAR2(2), tip_pacient VARCHAR(15), data_programare DATE, ora_programare VARCHAR2(10), motiv_programare VARCHAR2(225));
@@ -726,4 +728,38 @@ select * from table(findAnimaleDoctor);
 /*
 select * from useri where email='emag.dorel17@gmail.com';
 */
+select * from pacienti;
 
+create or replace package adaugaAnimal is
+    procedure adaugaUnNouAnimal(idStapan INT, numeAnimal VARCHAR2, varstaAnimal NUMBER, tipAnimal VARCHAR2);
+end adaugaAnimal;
+
+create or replace package body adaugaAnimal is
+    procedure adaugaUnNouAnimal(idStapan INT, numeAnimal VARCHAR2, varstaAnimal NUMBER, tipAnimal VARCHAR2)
+        is
+          existaSpecializare NUMBER;
+          id_pacient NUMBER;
+          id_pacient_stapan NUMBER;
+        begin
+          select count(*) into existaSpecializare from tip_animal where tip_animal = tipAnimal;
+          if(existaSpecializare != 0) then
+              select id into id_pacient from (select * from pacienti order by id desc) where rownum = 1;
+              id_pacient := id_pacient + 1;
+          
+              select id into id_pacient_stapan from (select * from pacient_stapan order by id desc) where rownum = 1;
+              id_pacient_stapan := id_pacient_stapan + 1;
+          
+              insert into pacienti values (id_pacient, numeAnimal, varstaAnimal, tipAnimal);
+              insert into pacient_stapan values (id_pacient_stapan, id_pacient, idStapan);
+          else
+              DBMS_OUTPUT.PUT_LINE('Nu ne ocupam de acest tip de animal.');
+          end if;
+        end adaugaUnNouAnimal;
+end adaugaAnimal;
+
+/*
+set serveroutput on;
+BEGIN
+  adaugaAnimal.adaugaUnNouAnimal('1', 'Mironica', '5', 'Dinozaur');
+END;
+*/
