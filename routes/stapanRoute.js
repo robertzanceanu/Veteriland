@@ -14,6 +14,15 @@ router.get('/:id', function (req, res) {
                 res.redirect('/doctori/'+Idd);
                 // req._parsedOriginalUrl.pathname = '/stapan/doctori'+req.params.id;
             }
+    if(req._parsedOriginalUrl.pathname === '/stapan/addPacient'){
+        res.redirect('/addPacient/' + Idd);
+    }
+    if(req._parsedOriginalUrl.pathname === '/stapan/addProgramare'){
+        res.redirect('/addProgramare/' + Idd);
+    }
+    if(req._parsedOriginalUrl.pathname === '/stapan/stapan'){
+        res.redirect('/stapan/' + Idd);
+    }
     else{
     res.sendFile(path.join(__dirname + '/../view/html/stapan.html'));
     //console.log("id sus");

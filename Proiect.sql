@@ -548,10 +548,12 @@ end adaugaONouaProgramare;
 /*
 set serveroutput on;
 begin
-  adaugaONouaProgramare.asignarePacientDoctor('Budincuta', 'Pisica', '12', 'Jneapan', 'Madalin', '12-AUG-19', '11:00', 'Stomatologie');
+  adaugaONouaProgramare.asignarePacientDoctor('Bidu', 'Papagal', '3', 'Kovaci', 'Adelin', '13-AUG-19', '11:00', 'Stomatologie');
 end;
 */
 /*
+select d.* from doctori d join specializare s on s.id_doctor = d.id join tip_animal t on t.id = s.id_animal where t.tip_animal = 'Papagal';
+
 select * from doctori where id=5;
 select * from useri where doctor =1;
 select d.id, t.tip_animal, c.id_user, d.nume, d.prenume from tip_animal t join specializare a on a.id_animal = t.id join doctori d on d.id = a.id_doctor
@@ -763,3 +765,5 @@ BEGIN
   adaugaAnimal.adaugaUnNouAnimal('1', 'Mironica', '5', 'Dinozaur');
 END;
 */
+
+select * from useri where doctor=0;

@@ -9,8 +9,8 @@ router.get('/', function (req, res) {
     res.sendFile(path.join(__dirname + '/../view/html/login.html'));
 });
 router.post('/', function (req, res) {
-    console.log(req.body);
-    console.log(req.body.email);
+    //console.log(req.body);
+    //console.log(req.body.email);
     var emailPost = req.body.email;
     var passwordPost = req.body.password;
     connection = oracledb.getConnection({
@@ -28,8 +28,8 @@ router.post('/', function (req, res) {
                         console.error(err.message);
                         doRelease(connection);
                     }
-                    console.log("am AJINS AICI");
-                    console.log(result.rows);
+                    //console.log("am AJINS AICI");
+                    //console.log(result.rows);
                     if (result.rows.length > 0) {
                         var rowData = {
                             id: result.rows[0][0],
@@ -39,7 +39,7 @@ router.post('/', function (req, res) {
                             stapan: result.rows[0][4]
                         };
                     }
-                    console.log(rowData);
+                    //console.log(rowData);
                     if(rowData.doctor==1){
                         passport.authenticate('local', { successRedirect: '/doctor',
                             failureRedirect: '/login' });

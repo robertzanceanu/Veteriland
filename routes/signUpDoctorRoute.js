@@ -5,7 +5,7 @@ const path = require('path');
 const oracledb = require('oracledb');
 const passport = require('passport');
 
-module.exports = router.get('/',function(req,res) {
+router.get('/',function(req,res) {
     res.sendFile(path.join(__dirname+'/../view/html/signUpDoctor.html'));
   });
 
@@ -70,3 +70,5 @@ router.post('/', (req, res) => {
         }
     //res.end()
   });
+
+module.exports = router;

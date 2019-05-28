@@ -7,14 +7,15 @@ var dateFormat = require("dateformat");
 
 router.get('/:id', function (req, res) {
     res.sendFile(path.join(__dirname + '/../view/html/doctor.html'));
-    console.log("id sus");
-    console.log(req.params.id);
+    //console.log("id sus");
+    //console.log(req.params.id);
     
 });
+
 router.route('/json/:id').get(function(req,res){
     var userId = req.params.id;
-    console.log("id-ul");
-    console.log(req.params.id);
+    //console.log("id-ul");
+    //console.log(req.params.id);
     connection = oracledb.getConnection({
         user: "student",
         password: "STUDENT",
@@ -91,8 +92,8 @@ router.route('/progr/:id').get(function(req,res){
                         reason: result.rows[i][5]
                     }
                 };
-                    console.log(rowData);
-                    console.log(result.rows[0][0]);
+                    //console.log(rowData);
+                    //console.log(result.rows[0][0]);
                     res.json(rowData);
                     doRelease(connection);
                 }

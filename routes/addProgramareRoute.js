@@ -5,11 +5,11 @@ const path = require('path');
 const oracledb = require('oracledb');
 const passport = require('passport');
 
-module.exports = router.get('/',function(req,res) {
+router.get('/:id',function(req,res) {
     res.sendFile(path.join(__dirname+'/../view/html/addProgramare.html'));
   });
 
-router.post('/', (req, res) => {
+router.post('/:id', (req, res) => {
     var animalNume = req.body.animalNume;
     var tipAnimal = req.body.tipAnimal;
     var varstaAnimal = req.body.varstaAnimal;
@@ -18,6 +18,7 @@ router.post('/', (req, res) => {
     var dataDorita = req.body.dataDorita;
     var oraDorita = req.body.oraDorita;
     var motivConsultatie = req.body.motivConsultatie;
+    var userId = req.params.id;
 
     var ora = oraDorita.substring(0,2);
 
@@ -51,14 +52,14 @@ router.post('/', (req, res) => {
                               motivConsultatie: motivConsultatie
                           },  
                   { autoCommit: true },
-                function(err, result) {
-                    if (err) {
+                function(err, result) {  
+                  if (err) {
                       console.error(err.message);
                       return;
                     }
-                    else {passport.authenticate('local', { successRedirect: '/addProgramare',
-                            failureRedirect: '/addProgramare' });
-                        res.redirect('/addProgramare');
+                    else {passport.authenticate('local', { successRedirect: '/addProgramare/:userId',
+                            failureRedirect: '/addProgramare/:userId' });
+                        res.redirect('/addProgramare/:userId');
                     }
                   });
   
@@ -71,3 +72,5 @@ router.post('/', (req, res) => {
         }
     //res.end()
   });
+
+  module.exports = router;

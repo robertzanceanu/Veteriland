@@ -5,14 +5,16 @@ const path = require('path');
 const oracledb = require('oracledb');
 const passport = require('passport');
 
-module.exports = router.get('/',function(req,res) {
+
+router.get('/:id',function(req,res) {
     res.sendFile(path.join(__dirname+'/../view/html/addPacient.html'));
   });
-/*
-router.post('/', (req, res) => {
+
+router.post('/:id', function(req, res){
     var animalNume = req.body.animalNume;
     var tipAnimal = req.body.tipAnimal;
     var varstaAnimal = req.body.varstaAnimal;
+    var userId = req.params.id;
 
         async function run()  {
           try {
@@ -24,12 +26,13 @@ router.post('/', (req, res) => {
                 console.log("Connected");
   
                 connection.execute(
-                  `BEGIN 
-                    adaugaONouaProgramare.asignarePacientDoctor(:animalNume, :tipAnimal, :varstaAnimal); 
-                  END;`, {
+                  `BEGIN
+                    adaugaAnimal.adaugaUnNouAnimal(:userId, :animalNume, :varstaAnimal, :tipAnimal);
+                   END;`, {
+                              userId: userId,
                               animalNume: animalNume,
-                              tipAnimal: tipAnimal,
                               varstaAnimal: varstaAnimal,
+                              tipAnimal: tipAnimal
                           },  
                   { autoCommit: true },
                 function(err, result) {
@@ -37,9 +40,9 @@ router.post('/', (req, res) => {
                       console.error(err.message);
                       return;
                     }
-                    else {passport.authenticate('local', { successRedirect: '/addPacient',
-                            failureRedirect: '/addPacient' });
-                        res.redirect('/addPacient');
+                    else {passport.authenticate('local', { successRedirect: '/addPacient/:userId',
+                            failureRedirect: '/addPacient/:userId' });
+                        res.redirect('/addPacient/:userId');
                     }
                   });
   
@@ -51,4 +54,6 @@ router.post('/', (req, res) => {
         run();  
         }
     //res.end()
-  );*/
+  );
+
+  module.exports = router;
