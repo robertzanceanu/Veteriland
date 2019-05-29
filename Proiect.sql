@@ -555,8 +555,12 @@ end adaugaONouaProgramare;
 /*
 set serveroutput on;
 begin
-  adaugaONouaProgramare.asignarePacientDoctor('Bidu', 'Papagal', '3', 'Kovaci', 'Adelin', '13-AUG-19', '11:00', 'Stomatologie');
+  adaugaONouaProgramare.asignarePacientDoctor('Dulcica', 'Pisica', '7', 'Pacurari', 'Iolanda', '23-AUG-19', '17:00', 'Vaccin');
 end;
+
+select * from doctori d join specializare s on s.id_doctor = d.id join tip_animal t on t.id = s.id_animal where t.tip_animal='Pisica';
+select * from pacienti where tip_animal = 'Pisica';
+select * from programari;
 */
 
 -- pipelined table function --
@@ -570,7 +574,7 @@ CREATE OR REPLACE PACKAGE returneazaProgramariOre AS
     function afiseazaProgramariDoctor(idDoctorUser INT) return t_findProgramareDoctori_tye pipelined;
     function oreDisponibileProg(numeDoctor VARCHAR2, prenumeDoctor VARCHAR2, dataProgramare DATE) return VARCHAR2;
 END returneazaProgramariOre;
-select * from useri where doctor = 1;
+
 CREATE OR REPLACE PACKAGE BODY returneazaProgramariOre AS
     function afiseazaProgramariDoctor(idDoctorUser INT) return t_findProgramareDoctori_tye pipelined
       as
@@ -606,7 +610,7 @@ END returneazaProgramariOre;
 
 /*
 select * from table(returneazaProgramariOre.afiseazaProgramariDoctor(40));
-select returneazaProgramariOre.oreDisponibileProg('Fuca', 'Andrei', '12-SEP-19') from dual;
+select returneazaProgramariOre.oreDisponibileProg('Pacurari', 'Iolanda', '23-AUG-19') from dual;
 */
 
 -- pipelined table function --
@@ -635,7 +639,7 @@ CREATE OR REPLACE PACKAGE BODY gasesteProgramari as
 END gasesteProgramari;
 
 /*
-select * from table(gasesteProgramari.findProgramare('5'));
+select * from table(gasesteProgramari.findProgramare(5));
 */
 
 create type tratamenteTrecute_type is object 
@@ -829,7 +833,7 @@ end adaugaAnimal;
 /*
 set serveroutput on;
 BEGIN
-  adaugaAnimal.adaugaUnNouAnimal('1', 'Mironica', '5', 'Hamster');
+  adaugaAnimal.adaugaUnNouAnimal(430, 'Mironica', '5', 'Hamster');
 END;
 */
 
