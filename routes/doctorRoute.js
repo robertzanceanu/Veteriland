@@ -71,7 +71,7 @@ router.route('/progr/:id').get(function(req,res){
         // console.log("Connected")
         function (err, connection) {
             connection.execute(
-                `select * from doctori where id=:userId`,
+                `select * from table(returneazaProgramariOre.afiseazaProgramariDoctor(:userId))`,
                 [userId = userId],
                 function (err, result) {
                     if (err) {

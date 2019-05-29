@@ -462,24 +462,6 @@ select * from stapani where nume = 'Mararara';
 select * from useri where email = 'marararamihai@yahoo.ro';
 */
 
-create or replace function returnDoctorByName(numeDoctor IN find_doctor.nume_doctor%TYPE, prenumeDoctor IN find_doctor.prenume_doctor%TYPE)
-return VARCHAR2 AS
-    numberOfDoctors NUMBER(30);
-    numeComplet VARCHAR2(100);
-begin
-    select count(*) into numberOfDoctors from find_doctor where nume_doctor = numeDoctor and prenume_doctor = prenumeDoctor;
-    if(numberOfDoctors != 0) then
-      numeComplet := concat(concat(numeDoctor, ' '), prenumeDoctor);
-      return numeComplet;
-    else
-      return 'Doctotul nu exista';
-    end if;
-end;
-
-/*
-select returnDoctorByName('Mandra', 'Codrina') from dual;
-*/
-
 --doctorii care se ocupa de un anumit tip de animal
 -- pipelined table function --
 create type findTypeAnimal_type is object 
@@ -488,18 +470,40 @@ create type findTypeAnimal_type is object
 --folosim findProgramareDoctori_type ca output
 create type t_findTypeAnimal_type as table of findTypeAnimal_type;
 
-create or replace function findTypeAnimal(numeTip VARCHAR2) return t_findTypeAnimal_type PIPELINED
-  as
-    queue_obj t_findTypeAnimal_type;
-  begin
-    for r_row in (select nume_doctor, prenume_doctor from find_doctor where specializare_animal = numeTip)
-    loop
-        pipe row(findTypeAnimal_type(r_row.nume_doctor, r_row.prenume_doctor));
-      end loop;
-end findTypeAnimal;
+CREATE OR REPLACE PACKAGE functiiDoctori IS
+    function returnDoctorByName(numeDoctor IN find_doctor.nume_doctor%TYPE, prenumeDoctor IN find_doctor.prenume_doctor%TYPE) return VARCHAR2;
+    function findTypeAnimal(numeTip VARCHAR2) return t_findTypeAnimal_type PIPELINED;
+END functiiDoctori;
 
+CREATE OR REPLACE PACKAGE BODY functiiDoctori IS
+    function returnDoctorByName(numeDoctor IN find_doctor.nume_doctor%TYPE, prenumeDoctor IN find_doctor.prenume_doctor%TYPE)
+        return VARCHAR2 AS
+            numberOfDoctors NUMBER(30);
+            numeComplet VARCHAR2(100);
+        begin
+            select count(*) into numberOfDoctors from find_doctor where nume_doctor = numeDoctor and prenume_doctor = prenumeDoctor;
+            if(numberOfDoctors != 0) then
+              numeComplet := concat(concat(numeDoctor, ' '), prenumeDoctor);
+              return numeComplet;
+            else
+              return 'Doctotul nu exista';
+            end if;
+        end;
+        
+        function findTypeAnimal(numeTip VARCHAR2) return t_findTypeAnimal_type PIPELINED
+            as
+              queue_obj t_findTypeAnimal_type;
+            begin
+              for r_row in (select nume_doctor, prenume_doctor from find_doctor where specializare_animal = numeTip)
+              loop
+                  pipe row(findTypeAnimal_type(r_row.nume_doctor, r_row.prenume_doctor));
+                end loop;
+          end findTypeAnimal;
+        
+END functiiDoctori;
 /*
-select * from table(findTypeAnimal('Papagal'));
+select functiiDoctori.returnDoctorByName('Valvoi', 'Dorel') from dual;
+select * from table(functiiDoctori.findTypeAnimal('Pisica'));
 */
 
 create or replace package adaugaONouaProgramare is
@@ -517,11 +521,14 @@ create or replace package body adaugaONouaProgramare is
       id_pacient_stapan NUMBER;
       foundPacient SYS_REFCURSOR;
       lineByLine NUMBER;
+      seOcupa NUMBER;
     begin
       select count(*) into existaProgramare from programari p join doctori d on p.id_doctor = d.id
           where d.nume = numeDoctor and d.prenume = prenumeDoctor and TO_CHAR(p.data, 'DD-MON-YY') = dataDorita and p.ora = oraDorita;
-          
-         if(existaProgramare = 0) then
+      select count(*) into seOcupa from doctori d join specializare s on s.id_doctor = d.id join tip_animal t on t.id = s.id_animal
+          where d.nume = numeDoctor and d.prenume = prenumeDoctor and t.tip_animal = tipPacient;
+         
+         if(existaProgramare = 0 and seOcupa != 0) then
             select id into id_programare from (select * from programari order by id desc) where rownum = 1;
             id_programare := id_programare + 1;
       
@@ -551,14 +558,6 @@ begin
   adaugaONouaProgramare.asignarePacientDoctor('Bidu', 'Papagal', '3', 'Kovaci', 'Adelin', '13-AUG-19', '11:00', 'Stomatologie');
 end;
 */
-/*
-select d.* from doctori d join specializare s on s.id_doctor = d.id join tip_animal t on t.id = s.id_animal where t.tip_animal = 'Papagal';
-
-select * from doctori where id=5;
-select * from useri where doctor =1;
-select d.id, t.tip_animal, c.id_user, d.nume, d.prenume from tip_animal t join specializare a on a.id_animal = t.id join doctori d on d.id = a.id_doctor
-    join doctoriuseri c on c.id_doctor = d.id join useri p on p.id = c.id_user where t.tip_animal='Pisica';
-*/
 
 -- pipelined table function --
 create type findProgramareDoctori_tye is object 
@@ -567,149 +566,178 @@ create type findProgramareDoctori_tye is object
 --folosim findProgramareDoctori_type ca output
 create type t_findProgramareDoctori_tye as table of findProgramareDoctori_tye;
 
-create or replace function afiseazaProgramariDoctor(idDoctorUser INT) return t_findProgramareDoctori_tye pipelined
-  as
-    queue_obj t_findProgramareDoctori_tye;
-  begin
-    for r_row in (select p.nume, p.varsta, p.tip_animal, r.data, r.ora, r.motiv from pacienti p
-                  join programari r on r.id_pacient = p.id join doctori d on d.id = r.id_doctor 
-                  join doctoriuseri a on a.id_doctor = d.id join useri c on c.id = a.id_user where c.id = idDoctorUser)
-      loop
-        pipe row(findProgramareDoctori_tye(r_row.nume, r_row.varsta, r_row.tip_animal, r_row.data, r_row.ora, r_row.motiv));
-      end loop;
-end afiseazaProgramariDoctor;
+CREATE OR REPLACE PACKAGE returneazaProgramariOre AS
+    function afiseazaProgramariDoctor(idDoctorUser INT) return t_findProgramareDoctori_tye pipelined;
+    function oreDisponibileProg(numeDoctor VARCHAR2, prenumeDoctor VARCHAR2, dataProgramare DATE) return VARCHAR2;
+END returneazaProgramariOre;
+select * from useri where doctor = 1;
+CREATE OR REPLACE PACKAGE BODY returneazaProgramariOre AS
+    function afiseazaProgramariDoctor(idDoctorUser INT) return t_findProgramareDoctori_tye pipelined
+      as
+        queue_obj t_findProgramareDoctori_tye;
+      begin
+        for r_row in (select p.nume, p.varsta, p.tip_animal, r.data, r.ora, r.motiv from pacienti p
+                      join programari r on r.id_pacient = p.id join doctori d on d.id = r.id_doctor 
+                      join doctoriuseri a on a.id_doctor = d.id join useri c on c.id = a.id_user where c.id = idDoctorUser)
+          loop
+            pipe row(findProgramareDoctori_tye(r_row.nume, r_row.varsta, r_row.tip_animal, r_row.data, r_row.ora, r_row.motiv));
+          end loop;
+    end afiseazaProgramariDoctor;
 
-select * from useri where id=40;
+    function oreDisponibileProg(numeDoctor VARCHAR2, prenumeDoctor VARCHAR2, dataProgramare DATE) return VARCHAR2 
+    as
+      v_count VARCHAR2(10);
+      v_index NUMBER;
+      disponibil NUMBER;
+      rezultat VARCHAR2(100);
+    begin
+        for v_index in 10..17 loop
+            v_count := concat(v_index, ':00');
+            select count(*) into disponibil from programari p
+                join doctori d on d.id = p.id_doctor
+                where TRIM(p.data) = TRIM(dataProgramare) and TRIM(p.ora) = TRIM(v_count) and d.nume = numeDoctor and d.prenume = prenumeDoctor;
+            if(disponibil = 0) then
+              rezultat := concat(concat(rezultat, ' '), v_count);
+            end if;
+        end loop;
+        return rezultat;
+    end oreDisponibileProg;
+END returneazaProgramariOre;
+
 /*
-select * from table(afiseazaProgramariDoctor(40));
+select * from table(returneazaProgramariOre.afiseazaProgramariDoctor(40));
+select returneazaProgramariOre.oreDisponibileProg('Fuca', 'Andrei', '12-SEP-19') from dual;
 */
 
-create or replace function findProgramare(numePacient VARCHAR2) return VARCHAR2
-as
-  dataProgramare DATE;
-  oraProgramare VARCHAR(10);
-  programare VARCHAR(100);
-begin
-  select data, ora into dataProgramare, oraProgramare from programari where id_pacient = (select id from pacienti where nume = numePacient);
-   programare := concat(concat(dataProgramare, ' '), oraProgramare);
-  return programare;
-end findProgramare;
+-- pipelined table function --
+create type findProgramare_typee is object (dataProgramare DATE, oraProgramare VARCHAR(10));
+
+--folosim findProgramare_type ca output
+create type t_findProgramare_typee as table of findProgramare_typee;
+
+CREATE OR REPLACE PACKAGE gasesteProgramari as
+    function findProgramare(idPacient INT) return t_findProgramare_typee PIPELINED;
+END gasesteProgramari;
+
+CREATE OR REPLACE PACKAGE BODY gasesteProgramari as
+      function findProgramare(idPacient INT) return t_findProgramare_typee PIPELINED
+      as
+        dataProgramare DATE;
+        oraProgramare VARCHAR(10);
+        programare VARCHAR(100);
+        queue_obj t_findProgramare_typee;
+      begin
+            for r_row in (select data, ora from programari p where id_pacient = idPacient)
+            loop
+              pipe row(findProgramare_typee(r_row.data, r_row.ora));
+            end loop;
+      end findProgramare;
+END gasesteProgramari;
 
 /*
-select findProgramare('Buburuza') from dual;
-*/
-
-create or replace function pacientDupaID(idPacient NUMBER) return VARCHAR2 
-as
-  numePacient VARCHAR2(30);
-begin
-    select nume into numePacient from pacienti where id = idPacient;
-    return numePacient;
-end pacientDupaID;
-
-/*
-select pacientDupaID(1) from dual;
-*/
-
-create or replace function returnNumarTelefon(numeUser VARCHAR2, prenumeUser VARCHAR2) return varchar2
-as
-  numarTelefon VARCHAR2(10);
-  esteDoctor NUMBER := 0;
-begin
-  select count(*) into esteDoctor from doctori where nume = numeUser and prenume = prenumeUser;  
-  if(esteDoctor = 1) then
-      select numar_telefon into numarTelefon from doctori where nume = numeUser and prenume = prenumeUser;
-  else
-      select numar_telefon into numarTelefon from stapani where nume = numeUser and prenume = prenumeUser;
-  end if;
-  return numarTelefon;
-end returnNumarTelefon;
-
-/*
-select returnNumarTelefon('Labici', 'Julieta') from dual;
+select * from table(gasesteProgramari.findProgramare('5'));
 */
 
 create type tratamenteTrecute_type is object 
   (data_tratament DATE, ora_tratament VARCHAR2(10), nume_doctor VARCHAR2(15), prenume_doctor VARCHAR2(30), motiv_programare VARCHAR2(225), tratament_urmat VARCHAR2(225));
 
---folosim findProgramareDoctori_type ca output
+--folosim tratamenteTrecute_type ca output
 create type t_tratamenteTrecute_type as table of tratamenteTrecute_type;
 
-create or replace function afiseazaTratamentePacient(numeStapan VARCHAR2, prenumeStapan VARCHAR2, numePacient VARCHAR2) return t_tratamenteTrecute_type pipelined
-  as
-    queue_obj t_tratamenteTrecute_type;
-    stapan_inexistent EXCEPTION;
-    PRAGMA EXCEPTION_INIT(stapan_inexistent, -20001);
-    pacient_inexistent EXCEPTION;
-    PRAGMA EXCEPTION_INIT(pacient_inexistent, -20002);
-    tratament_inexistent EXCEPTION;
-    PRAGMA EXCEPTION_INIT(tratament_inexistent, -20003);
-    existaStapan NUMBER;
-    existaPacient NUMBER;
-    existaTratament NUMBER;
-  begin
-    select count(*) into existaStapan from stapani where nume = numeStapan and prenume = prenumeStapan;
-    select count(*) into existaPacient from pacienti p join pacient_stapan a on a.id_pacient = p.id join stapani s on s.id = a.id_stapan
-              where p.nume = numePacient and s.nume = numeStapan and s.prenume = prenumeStapan;
-    select count(*) into existaTratament from tratamente t join pacient_tratament a on t.id = a.id_tratament join pacienti p on p.id = a.id_pacient
-            where p.nume = numePacient;
-            
-    if(existaStapan = 0) then
-      raise stapan_inexistent;
-    elsif(existaPacient = 0) then
-      raise pacient_inexistent;
-    elsif(existaTratament = 0) then
-      raise tratament_inexistent;
-    else
-        for r_row in (select r.data, r.ora, d.nume, d.prenume, r.motiv, m.medicatie
-                      from stapani s join pacient_stapan p on s.id = p.id_stapan 
-                      join pacienti a on p.id_pacient = a.id
-                      join programari r on r.id_pacient = a.id
-                      join doctori d on d.id = r.id_doctor
-                      join pacient_tratament t on t.id_pacient = a.id
-                      join tratamente m on m.id = t.id_tratament
-                      where s.nume = numeStapan and s.prenume = prenumeStapan and a.nume = numePacient and r.data < sysdate)
-        loop
-            pipe row(tratamenteTrecute_type(r_row.data, r_row.ora, r_row.nume, r_row.prenume, r_row.motiv, r_row.medicatie));
-          end loop;
-    end if;
-    
-    EXCEPTION
-      WHEN stapan_inexistent THEN
-        raise_application_error (-20001,'Stapanul ' || numeStapan || ' ' || prenumeStapan || ' nu exista in baza de date.');
-      WHEN pacient_inexistent THEN
-        raise_application_error (-20002,'Pacientul ' || numePacient || ' nu exista in baza de date.');
-      WHEN tratament_inexistent THEN
-        raise_application_error (-20003,'Pacientul ' || numePacient || ' nu a primit inca niciun tratament.');
-end afiseazaTratamentePacient;
+CREATE OR REPLACE PACKAGE returneazaPacient is
+    function pacientDupaID(idPacient NUMBER) return VARCHAR2;
+    function afiseazaTratamentePacient(numeStapan VARCHAR2, prenumeStapan VARCHAR2, numePacient VARCHAR2) return t_tratamenteTrecute_type pipelined;
+END returneazaPacient;
+
+CREATE OR REPLACE PACKAGE BODY returneazaPacient is
+      function pacientDupaID(idPacient NUMBER) return VARCHAR2 
+      as
+        numePacient VARCHAR2(30);
+      begin
+          select nume into numePacient from pacienti where id = idPacient;
+          return numePacient;
+      end pacientDupaID;
+      
+      function afiseazaTratamentePacient(numeStapan VARCHAR2, prenumeStapan VARCHAR2, numePacient VARCHAR2) return t_tratamenteTrecute_type pipelined
+            as
+              queue_obj t_tratamenteTrecute_type;
+              stapan_inexistent EXCEPTION;
+              PRAGMA EXCEPTION_INIT(stapan_inexistent, -20001);
+              pacient_inexistent EXCEPTION;
+              PRAGMA EXCEPTION_INIT(pacient_inexistent, -20002);
+              tratament_inexistent EXCEPTION;
+              PRAGMA EXCEPTION_INIT(tratament_inexistent, -20003);
+              existaStapan NUMBER;
+              existaPacient NUMBER;
+              existaTratament NUMBER;
+            begin
+              select count(*) into existaStapan from stapani where nume = numeStapan and prenume = prenumeStapan;
+              select count(*) into existaPacient from pacienti p join pacient_stapan a on a.id_pacient = p.id join stapani s on s.id = a.id_stapan
+                        where p.nume = numePacient and s.nume = numeStapan and s.prenume = prenumeStapan;
+              select count(*) into existaTratament from tratamente t join pacient_tratament a on t.id = a.id_tratament join pacienti p on p.id = a.id_pacient
+                      where p.nume = numePacient;
+                      
+              if(existaStapan = 0) then
+                raise stapan_inexistent;
+              elsif(existaPacient = 0) then
+                raise pacient_inexistent;
+              elsif(existaTratament = 0) then
+                raise tratament_inexistent;
+              else
+                  for r_row in (select r.data, r.ora, d.nume, d.prenume, r.motiv, m.medicatie
+                                from stapani s join pacient_stapan p on s.id = p.id_stapan 
+                                join pacienti a on p.id_pacient = a.id
+                                join programari r on r.id_pacient = a.id
+                                join doctori d on d.id = r.id_doctor
+                                join pacient_tratament t on t.id_pacient = a.id
+                                join tratamente m on m.id = t.id_tratament
+                                where s.nume = numeStapan and s.prenume = prenumeStapan and a.nume = numePacient and r.data < sysdate)
+                  loop
+                      pipe row(tratamenteTrecute_type(r_row.data, r_row.ora, r_row.nume, r_row.prenume, r_row.motiv, r_row.medicatie));
+                    end loop;
+              end if;
+              
+              EXCEPTION
+                WHEN stapan_inexistent THEN
+                  raise_application_error (-20001,'Stapanul ' || numeStapan || ' ' || prenumeStapan || ' nu exista in baza de date.');
+                WHEN pacient_inexistent THEN
+                  raise_application_error (-20002,'Pacientul ' || numePacient || ' nu exista in baza de date.');
+                WHEN tratament_inexistent THEN
+                  raise_application_error (-20003,'Pacientul ' || numePacient || ' nu a primit inca niciun tratament.');
+       end afiseazaTratamentePacient;      
+END returneazaPacient;
 
 /*
-select * from table(afiseazaTratamentePacient('Fuca', 'Andrei', 'Cocorico'));
-select * from table(afiseazaTratamentePacient('Udangiu', 'Eusebiu', 'Pisicila')); 
+select returneazaPacient.pacientDupaID(1) from dual;
+
+select * from table(returneazaPacient.afiseazaTratamentePacient('Fuca', 'Andrei', 'Cocorico'));
+select * from table(returneazaPacient.afiseazaTratamentePacient('Udangiu', 'Eusebiu', 'Pisicila')); 
 select * from stapani where nume = 'Fuca';
 select * from pacienti where nume = 'Pisicila';
 */
 
-create or replace function oreDisponibileProg(numeDoctor VARCHAR2, prenumeDoctor VARCHAR2, dataProgramare DATE) return VARCHAR2 as
-  v_count VARCHAR2(10);
-  v_index NUMBER;
-  disponibil NUMBER;
-  rezultat VARCHAR2(100);
-begin
-    for v_index in 10..17 loop
-        v_count := concat(v_index, ':00');
-        select count(*) into disponibil from programari p
-            join doctori d on d.id = p.id_doctor
-            where TRIM(p.data) = TRIM(dataProgramare) and TRIM(p.ora) = TRIM(v_count) and d.nume = numeDoctor and d.prenume = prenumeDoctor;
-        if(disponibil = 0) then
-          rezultat := concat(concat(rezultat, ' '), v_count);
-        end if;
-    end loop;
-    return rezultat;
-end oreDisponibileProg;
+CREATE OR REPLACE PACKAGE returneazaNumarTelefon AS
+    function returnNumarTelefon(numeUser VARCHAR2, prenumeUser VARCHAR2) return varchar2;
+END returneazaNumarTelefon;
+
+CREATE OR REPLACE PACKAGE BODY returneazaNumarTelefon AS
+    function returnNumarTelefon(numeUser VARCHAR2, prenumeUser VARCHAR2) return varchar2
+    as
+      numarTelefon VARCHAR2(10);
+      esteDoctor NUMBER := 0;
+    begin
+      select count(*) into esteDoctor from doctori where nume = numeUser and prenume = prenumeUser;  
+      if(esteDoctor = 1) then
+          select numar_telefon into numarTelefon from doctori where nume = numeUser and prenume = prenumeUser;
+      else
+          select numar_telefon into numarTelefon from stapani where nume = numeUser and prenume = prenumeUser;
+      end if;
+      return numarTelefon;
+    end returnNumarTelefon;
+END returneazaNumarTelefon;
 
 /*
-select oreDisponibileProg('Fuca', 'Andrei', '12-SEP-19') from dual;
+select returneazaNumarTelefon.returnNumarTelefon('Valvoi', 'Dorel') from dual;
 */
 
 --toate animalele unui anumit stapan
@@ -718,26 +746,27 @@ create type allAnimals_typ is object (numeAnimal VARCHAR2(15), varstaAnimal NUMB
 --folosim t_allAnimals_type ca output
 create type t_allAnimals_typ as table of allAnimals_typ;
 
-create or replace function allAnimals(idStapan INT) return t_allAnimals_typ PIPELINED
-  as
-    queue_obj t_allAnimals_typ;
-  begin
-    for r_row in (select p.nume, p.varsta, p.tip_animal from pacienti p join pacient_stapan a on p.id = a.id_pacient 
-                  join stapani s on s.id = a.id_stapan join stapaniuseri b on b.id_stapan = s.id join useri u on u.id = b.id_user  
-                  where u.id = idStapan)
-    loop
-        pipe row(allAnimals_typ(r_row.nume, r_row.varsta, r_row.tip_animal));
-      end loop;
-end allAnimals;
-/*
-select * from useri where stapan=1;
-select * from stapani where nume='Gherca' and prenume='Claudia';
-select p.nume from pacienti p join pacient_stapan s on p.id = s.id_pacient where s.id_stapan=1;
-*/
-/*
-select * from table(allAnimals(101));
-*/
+CREATE OR REPLACE PACKAGE returneazaAnimale AS
+    function allAnimals(idStapan INT) return t_allAnimals_typ PIPELINED;
+END returneazaAnimale;
 
+CREATE OR REPLACE PACKAGE BODY returneazaAnimale AS
+  function allAnimals(idStapan INT) return t_allAnimals_typ PIPELINED
+    as
+      queue_obj t_allAnimals_typ;
+    begin
+      for r_row in (select p.nume, p.varsta, p.tip_animal from pacienti p join pacient_stapan a on p.id = a.id_pacient 
+                    join stapani s on s.id = a.id_stapan join stapaniuseri b on b.id_stapan = s.id join useri u on u.id = b.id_user  
+                    where u.id = idStapan)
+      loop
+          pipe row(allAnimals_typ(r_row.nume, r_row.varsta, r_row.tip_animal));
+        end loop;
+  end allAnimals;
+END returneazaAnimale;
+
+/*
+select * from table(returneazaAnimale.allAnimals(424));
+*/
 
 --toti doctorii
 -- pipelined table function --
@@ -747,24 +776,25 @@ create type findAnimaleDoctor_type is object
 --folosim findProgramareDoctori_type ca output
 create type t_findAnimaleDoctor_type as table of findAnimaleDoctor_type;
 
-create or replace function findAnimaleDoctor return t_findAnimaleDoctor_type PIPELINED
-  as
-    queue_obj t_findAnimaleDoctor_type;
-  begin
-    for r_row in (select d.nume, d.prenume, t.tip_animal, d.numar_telefon from doctori d
-                  join specializare s on s.id_doctor = d.id join tip_animal t on t.id = s.id_animal)
-    loop
-        pipe row(findAnimaleDoctor_type(r_row.nume, r_row.prenume, r_row.tip_animal, r_row.numar_telefon));
-      end loop;
-end findAnimaleDoctor;
+CREATE OR REPLACE PACKAGE returneazaDoctori AS
+    function returnamDoctorii return t_findAnimaleDoctor_type PIPELINED;
+END returneazaDoctori;
 
+CREATE OR REPLACE PACKAGE BODY returneazaDoctori AS
+    function returnamDoctorii return t_findAnimaleDoctor_type PIPELINED
+      as
+        queue_obj t_findAnimaleDoctor_type;
+      begin
+        for r_row in (select d.nume, d.prenume, t.tip_animal, d.numar_telefon from doctori d
+                      join specializare s on s.id_doctor = d.id join tip_animal t on t.id = s.id_animal)
+        loop
+            pipe row(findAnimaleDoctor_type(r_row.nume, r_row.prenume, r_row.tip_animal, r_row.numar_telefon));
+          end loop;
+    end returnamDoctorii;
+END returneazaDoctori;
 /*
-select * from table(findAnimaleDoctor);
+select * from table(returneazaDoctori.returnamDoctorii);
 */
-/*
-select * from useri where email='emag.dorel17@gmail.com';
-*/
-select * from pacienti;
 
 create or replace package adaugaAnimal is
     procedure adaugaUnNouAnimal(idStapan INT, numeAnimal VARCHAR2, varstaAnimal NUMBER, tipAnimal VARCHAR2);
@@ -778,9 +808,6 @@ create or replace package body adaugaAnimal is
           id_pacient_stapan NUMBER;
           id_stapaan NUMBER;
         begin
-          DBMS_OUTPUT.PUT_LINE(idStapan ||' '||numeAnimal||' '||varstaAnimal||' '||tipAnimal);
-
-        
           select count(*) into existaSpecializare from tip_animal where tip_animal = tipAnimal;
           if(existaSpecializare != 0) then
               select id into id_pacient from (select * from pacienti order by id desc) where rownum = 1;
@@ -805,3 +832,10 @@ BEGIN
   adaugaAnimal.adaugaUnNouAnimal('1', 'Mironica', '5', 'Hamster');
 END;
 */
+
+select * from doctori where nume='Pacurari';
+select * from specializare s join tip_animal t on s.id_animal = t.id where s.id_doctor = 16;
+select * from useri where email='pacurari.iolanda16@gmail.com';
+select * from useri where stapan=1;
+select * from programari
+select * from pacienti;

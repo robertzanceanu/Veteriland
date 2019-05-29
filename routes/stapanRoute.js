@@ -101,7 +101,7 @@ router.route('/pac/:id').get(function(req,res){
         // console.log("Connected")
         function (err, connection) {
             connection.execute(
-                `select * from table(allAnimals(:id))`,
+                `select * from table(returneazaAnimale.allAnimals(:id))`,
                 [id = userId],
                 function (err, result) {
                     if (err) {

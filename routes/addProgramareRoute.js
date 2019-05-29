@@ -36,7 +36,7 @@ router.post('/:id', (req, res) => {
                   password      : "STUDENT",
                   connectString : "localhost:1521/xe"
                 });
-                console.log("Connected");
+                //console.log("Connected");
   
                 connection.execute(
                   `BEGIN 
@@ -53,13 +53,14 @@ router.post('/:id', (req, res) => {
                           },  
                   { autoCommit: true },
                 function(err, result) {  
+                  console.log('succes');
                   if (err) {
                       console.error(err.message);
                       return;
                     }
-                    else {passport.authenticate('local', { successRedirect: '/addProgramare/:userId',
-                            failureRedirect: '/addProgramare/:userId' });
-                        res.redirect('/addProgramare/:userId');
+                    else {passport.authenticate('local', { successRedirect: '/addProgramare/' + userId,
+                            failureRedirect: '/addProgramare/' + userId });
+                        res.redirect('/addProgramare/' + userId);
                     }
                   });
   
